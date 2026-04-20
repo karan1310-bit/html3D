@@ -6,9 +6,9 @@ import { createProjector } from "../utils/ProjectedMaterial";
 import ImportGltf from "../utils/ImportGltf";
 import { keyframeValue, smoothstep } from "../utils/utils";
 
-const CAMERA_FOV = 45;
-const REST_POSITION = new THREE.Vector3(0, 0, 15);
-const LOOK_TARGET = new THREE.Vector3(0, -1, -4);
+const CAMERA_FOV = 25;
+const REST_POSITION = new THREE.Vector3(0, 0, 20);
+const LOOK_TARGET = new THREE.Vector3(0, -3, -4);
 
 export default class Scene {
 	constructor() {
@@ -39,7 +39,7 @@ export default class Scene {
 
 	#setupScene() {
 		this.scene = new THREE.Scene();
-		this.scene.background = new THREE.Color(0xffffff);
+		this.scene.background = new THREE.Color(0xEED7AE);
 	}
 
 	#setupCamera() {
@@ -55,10 +55,10 @@ export default class Scene {
 	}
 
 	#addLights() {
-		const ambient = new THREE.AmbientLight(0xffffff, 1.0);
+		const ambient = new THREE.AmbientLight(0xEED7AE, 2.0);
 		this.scene.add(ambient);
 
-		const key = new THREE.DirectionalLight(0xffffff, 2.6);
+		const key = new THREE.DirectionalLight(0xEED7AE, 2.6);
 		key.position.set(5, 8, 6);
 		key.castShadow = true;
 		key.shadow.mapSize.set(2048, 2048);
@@ -77,17 +77,17 @@ export default class Scene {
 	#addObjects() {
 		this.projectedMeshes = [];
 		const standardMaterial = new THREE.MeshStandardMaterial({
-			color: 0xffffff,
+			color: 0xEED7AE,
 		});
-
-		const basicMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-
+	
+		const basicMaterial = new THREE.MeshBasicMaterial({ color: 0xEED7AE });
+	
 		new ImportGltf(`${import.meta.env.BASE_URL}model.glb`, {
 			onLoad: (model) => {
 				this.model = model;
 				model.traverse((c) => {
 					if (!c.isMesh) return;
-
+	
 					if (c.userData.name == "bg") {
 						c.material = basicMaterial;
 						c.castShadow = false;
@@ -97,11 +97,25 @@ export default class Scene {
 						c.castShadow = true;
 						c.receiveShadow = true;
 					}
-
+	
 					this.projectedMeshes.push(c);
 				});
-
+	
+				this.model.scale.setScalar(16);
+				this.model.position.set(0, -3, 0);
+				this.model.rotation.y = Math.PI; 
 				this.scene.add(this.model);
+	
+				// --- NEW: add background plane to catch projection ---
+				const bgGeometry = new THREE.PlaneGeometry(40, 25);
+				const bgMesh = new THREE.Mesh(bgGeometry, basicMaterial);
+				bgMesh.position.set(0, 0, -8);
+				bgMesh.userData.name = "bg";
+				bgMesh.receiveShadow = true;
+				this.scene.add(bgMesh);
+				this.projectedMeshes.push(bgMesh);
+				// --- end new ---
+	
 				this.#setupProjection();
 			},
 		});

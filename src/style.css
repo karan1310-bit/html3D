@@ -12,7 +12,7 @@
 }
 
 .is-heading {
-	@apply font-bold text-5xl sm:text-7xl md:text-8xl lg:text-8xl tracking-[-0.06em] font-sans !leading-none;
+	@apply font-bold text-6xl sm:text-7xl md:text-8xl lg:text-8xl tracking-[-0.06em] font-sans !leading-none;
 }
 
 p {
@@ -38,5 +38,5 @@ p {
 
 html,
 body {
-	@apply bg-[#f1f1f1] font-sans;
+	@apply bg-[#010101] font-sans;
 }
