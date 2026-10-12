@@ -6,6 +6,10 @@ import { createProjector } from "../utils/ProjectedMaterial";
 import ImportGltf from "../utils/ImportGltf";
 import { keyframeValue, smoothstep } from "../utils/utils";
 
+// Brand palette
+const COLOR_PRIMARY = 0xff4432; // red-orange
+const COLOR_DARK = 0x111111; // near-black
+
 const CAMERA_FOV = 25;
 const REST_POSITION = new THREE.Vector3(0, 0, 20);
 const LOOK_TARGET = new THREE.Vector3(0, -3, -4);
@@ -39,7 +43,7 @@ export default class Scene {
 
 	#setupScene() {
 		this.scene = new THREE.Scene();
-		this.scene.background = new THREE.Color(0xEED7AE);
+		this.scene.background = new THREE.Color(COLOR_PRIMARY);
 	}
 
 	#setupCamera() {
@@ -55,10 +59,12 @@ export default class Scene {
 	}
 
 	#addLights() {
-		const ambient = new THREE.AmbientLight(0xEED7AE, 2.0);
+		// Neutral lights so the red-orange stays true instead of being
+		// tinted. Hemisphere ground colour pulls shadows toward #111111.
+		const ambient = new THREE.HemisphereLight(0xffffff, COLOR_DARK, 1.8);
 		this.scene.add(ambient);
 
-		const key = new THREE.DirectionalLight(0xEED7AE, 2.6);
+		const key = new THREE.DirectionalLight(0xffffff, 2.2);
 		key.position.set(5, 8, 6);
 		key.castShadow = true;
 		key.shadow.mapSize.set(2048, 2048);
@@ -77,10 +83,12 @@ export default class Scene {
 	#addObjects() {
 		this.projectedMeshes = [];
 		const standardMaterial = new THREE.MeshStandardMaterial({
-			color: 0xEED7AE,
+			color: COLOR_PRIMARY,
+			roughness: 0.85,
+			metalness: 0,
 		});
 	
-		const basicMaterial = new THREE.MeshBasicMaterial({ color: 0xEED7AE });
+		const basicMaterial = new THREE.MeshBasicMaterial({ color: COLOR_PRIMARY });
 	
 		new ImportGltf(`${import.meta.env.BASE_URL}model.glb`, {
 			onLoad: (model) => {
